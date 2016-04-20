@@ -1,0 +1,31 @@
+handles.backGroundColor=[0,0,1];
+handles.spotSize=2;
+handles.spotHeight=5;
+handles.spotSeperateDegrees=20;
+handles.spotNumber=5;
+handles.g_RandomOrder=1;
+handles.g_IncreasingOrder=2;%this is used as global variable
+handles.g_DecreasingOrder=3;
+handles.spotOrder=handles.g_RandomOrder;
+handles.spotOnTime=1;
+handles.spotInterval=4;
+handles.g_Spot=1;
+handles.g_Bar=2;
+handles.entity=handles.g_Spot;
+handles.g_Solid=1;
+handles.g_Checkerboard=2;
+handles.surface=handles.g_Solid;
+handles.g_Horizontal=1;
+handles.g_Vertical=2;
+handles.movement=handles.g_Horizontal;
+handles.movieInterval=1;
+handles.baselineDuration=5;
+handles.endbaselineDuration=5;
+handles.frames=30;
+handles.movieStore=struct('HashID',[],'Setting',[],'RawMovie',{},'Movie',{});
+handles.moviePool=[];%record the path of the movie, Sync with the movieStore Index
+handles.movieList=[];%record the ID of the movie, Sync with the movieStore HashID
+handles.movieNum=0;
+handles.fieldHeight
+handles.fieldWidth
+`q(fieldHeight,fieldWidth,3)
