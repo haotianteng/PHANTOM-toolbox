@@ -835,13 +835,14 @@ for CurrentFrame=1:handles.totalFrames
     handles.effectIm=[];
     handles.patternIm=[];
     GenMovie;
-    if(CurrentFrame>1)&& isequal(handles.movieStore.RawMovie{CurrentNum}(:,:,:),handles.effectIm)
+    if(CurrentFrame>1)&& isequal(handles.movieStore.RawMovie{CurrentNum},handles.effectIm)
+%     if isequal(handles.movieStore.RawMovise{CurrentNum},handles.effectIm)
             handles.movieStore.Movie{CurrentNum}(:,:,:,CurrentFrame)=handles.movieStore.Movie{CurrentNum}(:,:,:,CurrentFrame-1);
     else
             Transform;
             handles.movieStore.Movie{CurrentNum}(:,:,:,CurrentFrame)=handles.patternIm;
     end
-    handles.movieStore.RawMovie{CurrentNum}(:,:,:)=handles.effectIm;
+    handles.movieStore.RawMovie{CurrentNum}=handles.effectIm;
 end
 display('Movie generated successfully! Check the overlap.');
 TempMovie=handles.movieStore.Movie{CurrentNum};

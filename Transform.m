@@ -10,10 +10,17 @@ mindegree=0;
 % tstart=tic();
 [Height,Width,N]=size(handles.effectIm);
 handles.cylindricalCoordinate=zeros(Height,Width,2);%first is the Theta coordinate, and the next one is relative Z coordinate
+handles.projectCoordinate=zeros(Height,Width,2);%first is the X ,second is the Y
+handles.bodyCoordinate=zeros(Height,Width,3);%first is the X coordinate, and the next one is Y coordinate and third one is Z coordinate
+%%%GPU Accerelate %%% Need Nvidia GPU installed.
+% % handles.bodyCoordinate=gpuArray(single(handles.bodyCoordinate));
+% % handles.cylindricalCoordinate=gpuArray(single(handles.cylindricalCoordinate));
+% % handles.projectCoordinate=gpuArray(single(handles.projectCoordinate));
+%%%%
 %Generate related mesh coordinate
+
 [handles.cylindricalCoordinate(:,:,1),handles.cylindricalCoordinate(:,:,2)]=meshgrid(mindegree:handles.stripWidthResolution:handles.stripWidth,0:handles.stripHeightResolution:handles.stripHeight);
 handles.cylindricalCoordinate(:,:,1)=handles.cylindricalCoordinate(:,:,1)./360.*2*pi;
-
 [PHeight,PWidth,N2]=size(handles.backGroundIm);
 R=handles.dishRadius;
 D=handles.distance;
@@ -21,15 +28,14 @@ Hratio=handles.fieldHeight/handles.physicalHeight*D;
 Wratio=handles.fieldWidth/handles.physicalWidth*D;%60 and 104 is the General length of the projector image
 
 
-%
-handles.bodyCoordinate=zeros(Height,Width,3);%first is the X coordinate, and the next one is Y coordinate and third one is Z coordinate
+
+
 handles.bodyCoordinate(:,:,1)=R+D-R.*sin(handles.cylindricalCoordinate(:,:,1));
 handles.bodyCoordinate(:,:,2)=y0+R.*cos(handles.cylindricalCoordinate(:,:,1));
 handles.bodyCoordinate(:,:,3)=z0-handles.cylindricalCoordinate(:,:,2);
 
 
 handles.patternIm=handles.backGroundIm;
-handles.projectCoordinate=zeros(Height,Width,2);%first is the X ,second is the Y
 
 % for i=1:Height
 %     for j=1:Width
@@ -83,7 +89,8 @@ RefIndex=1:Height*Width;
 RCoor=find(REffectIm==255*handles.backGroundColor(1));
 GCoor=find(GEffectIm==255*handles.backGroundColor(2));
 BCoor=find(BEffectIm==255*handles.backGroundColor(3));
-EffectIndex=intersect(intersect(RCoor,GCoor),BCoor);
+EffectIndex=c_Intersect(c_Intersect(RCoor,GCoor),BCoor);
+% EffectIndex=MY_intersect(MY_intersect(RCoor,GCoor),BCoor);
 RefIndex(EffectIndex)=[];%exclude the pixal that is background
 patternIm=reshape(handles.patternIm,1,PHeight*PWidth*3);
 effectIm=reshape(handles.effectIm,1,Height*Width*3);
