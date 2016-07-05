@@ -1,17 +1,17 @@
 if isfield(handles,'fieldHeight')
     fieldHeight=handles.fieldHeight;
 else
-    fieldHeight=480;
+    fieldHeight=W;
     handles.fieldHeight=fieldHeight;
-    set(handles.HeightField,'String','480')
+    set(handles.HeightField,'String',num2str(W))
 end
 
 if isfield(handles,'fieldWidth')
     fieldWidth=handles.fieldWidth;
 else
-    fieldWidth=854;
+    fieldWidth=H;
     handles.fieldWidth=fieldWidth;
-    set(handles.WidthField,'String','854')
+    set(handles.WidthField,'String',num2str(H))
 end
 backGroundIm=zeros(fieldHeight,fieldWidth,3);
 backGroundColor=[0,0,1];
@@ -39,6 +39,7 @@ stripWidthResolution=handles.stripWidthResolution;%still unit in degree;
 Height=ceil(stripHeight/stripHeightResolution)+1;
 Width=ceil(stripWidth/stripWidthResolution)+1;
 handles.effectIm=zeros(Height,Width,3);
+PreTransform;
 Transform;
 handles.backGroundIm=handles.patternIm;
 %%%%%%%%%%%%Here reverse the Color of the anticipant area(Black) and the

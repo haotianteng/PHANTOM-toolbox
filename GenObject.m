@@ -15,6 +15,7 @@ if(handles.surface==handles.g_Solid)
     handles.object(:,:,i)=tempObject;
     end
     else
+        if (handles.entity == hand)
     end
 else
 end

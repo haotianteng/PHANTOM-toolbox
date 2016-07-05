@@ -22,7 +22,7 @@ function varargout = Grid(varargin)
 
 % Edit the above text to modify the response to help Grid
 
-% Last Modified by GUIDE v2.5 14-Mar-2016 03:25:33
+% Last Modified by GUIDE v2.5 04-Jul-2016 15:12:30
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -74,7 +74,7 @@ function varargout = Grid_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 
 varargout{1} = handles.output;
-if(size(handles.output,2)>=2)
+if(size(handles.output,2)>=3)
 delete(handles.figure1);
 end
 
@@ -86,6 +86,7 @@ function OK_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.output(1)=str2num(get(handles.GridColumn,'String'));
 handles.output(2)=str2num(get(handles.GridRow,'String'));
+handles.output(3)=str2num(get(handles.GridThickness,'String'));
 if(size(handles.output,2)>=2)
 uiresume(handles.figure1);
 else
@@ -132,6 +133,29 @@ guidata(hObject,handles)
 % --- Executes during object creation, after setting all properties.
 function GridRow_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to GridRow (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function GridThickness_Callback(hObject, eventdata, handles)
+% hObject    handle to GridThickness (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.output(3)=str2num(get(hObject,'String'));
+% Hints: get(hObject,'String') returns contents of GridThickness as text
+%        str2double(get(hObject,'String')) returns contents of GridThickness as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function GridThickness_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to GridThickness (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 

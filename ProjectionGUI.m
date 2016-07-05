@@ -51,7 +51,7 @@ function ProjectionGUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to ProjectionGUI (see VARARGIN)
-clc
+clc;
 % Choose default command line output for ProjectionGUI
 handles.output = hObject;
 addpath('mtimesx');
@@ -66,9 +66,12 @@ handles.stripHeight=10;
 handles.stripWidth=180;
 handles.stripHeightResolution=0.01;
 handles.stripWidthResolution=0.1;
-handles.distance=174;
-handles.z0=5;
-handles.gamma=0;
+handles.distance=224;
+set(handles.Distance,'String',num2str(handles.distance));
+handles.z0=-17; %the dishes is 22 mm under the horizontal line, and calcualte from the
+set(handles.Z0,'String',num2str(handles.z0));
+handles.gamma=-5.6;
+set(handles.Gamma,'String',num2str(handles.gamma));
 handles.win1=0;
 handles.backGroundColor=[0,0,1];
 handles.spotSize=2;
@@ -100,6 +103,17 @@ handles.moviePool={};%only record the ID of the movie, always synchronize with t
 handles.movieList={};%only record the ID of the movie
 handles.movieNum=0;
 handles.spot=[];
+handles.IO = struct('Device',[],'Session',[]);
+try
+    
+    handles.IO.Device = daq.getDevices;
+    handles.IO.Session = daq.createSession('ni');
+    [handles.Channel1,handles.Index1] = handles.IO.Session.addDigitalChannel('Dev1','port0/line1','OutputOnly');
+    [handles.Channel2,handles.Index2] = handles.IO.Session.addDigitalChannel('Dev1','port0/line2','OutputOnly');
+catch error
+    display(error.message);
+end
+set(handles.GenerateMovie,'enable','off')
 % Update handles structure
 guidata(hObject, handles);
 
@@ -438,7 +452,9 @@ BackGroundTailor;
 % DisplayPos=[20,20,20+fieldWidth,20+fieldHeight];
 % Transform;
 Refresh;
+set(handles.GenerateMovie,'enable','on');
 guidata(hObject,handles);
+
 
 
 
@@ -461,7 +477,7 @@ function Up_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.z0=handles.z0-1;
 set(handles.Z0,'String',handles.z0);
-Transform;
+BackGroundTailor;
 Refresh;
 guidata(hObject,handles);
 
@@ -487,10 +503,9 @@ function Down_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.z0=handles.z0+1;
 set(handles.Z0,'String',handles.z0);
-Transform;
+BackGroundTailor;
 Refresh;
 guidata(hObject,handles);
-
 
 
 % --- Executes on button press in Reset.
@@ -507,10 +522,9 @@ function InclineUp_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.gamma=handles.gamma+1;
 set(handles.Gamma,'String',handles.gamma);
-Transform;
+BackGroundTailor;
 Refresh;
 guidata(hObject,handles);
-
 
 % --- Executes on button press in InclineDown.
 function InclineDown_Callback(hObject, eventdata, handles)
@@ -519,10 +533,9 @@ function InclineDown_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.gamma=handles.gamma-1;
 set(handles.Gamma,'String',handles.gamma);
-Transform;
+BackGroundTailor;
 Refresh;
 guidata(hObject,handles);
-
 
 
 function RCustomizedColor_Callback(hObject, eventdata, handles)
@@ -554,7 +567,7 @@ function GridTest_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
+setappdata(0,'mainHandle',handles);
 hGrid=Grid();%read the Grid parameter
 handles.Grid=hGrid;
 
@@ -578,17 +591,25 @@ handles.effectIm=zeros(Height,Width,3);
 handles.effectIm(:,:,1)=handles.backGroundColor(1)*255;
 handles.effectIm(:,:,2)=handles.backGroundColor(2)*255;
 handles.effectIm(:,:,3)=handles.backGroundColor(3)*255;
+GridThickness = hGrid(3);
 
+for i=2:hGrid(1)-1
 
-for i=1:hGrid(1)
-handles.effectIm(:,1+round((i-1)*(Width-1)/(hGrid(1)-1)),:)=0;
+handles.effectIm(:,round((i-1)*(Width-1)/(hGrid(1)-1)-GridThickness/2):1:round(GridThickness/2+(i-1)*(Width-1)/(hGrid(1)-1)),:)=1;
+
 end
+handles.effectIm(:,1:round(GridThickness/2),:)=1;
+handles.effectIm(:,Width:-1:Width-round(GridThickness/2),:)=1;
 
-for i=1:hGrid(2)
-handles.effectIm(1+round((i-1)*(Height-1)/(hGrid(2)-1)),:,:)=0;
+
+for i=2:hGrid(2)-1
+
+handles.effectIm(1+round((i-1)*(Height-1)/(hGrid(2)-1)-GridThickness/2):1:round(GridThickness/2+(i-1)*(Height-1)/(hGrid(2)-1)),:,:)=1;
+
 end
-
-% handles.effectIm(:,:,:)=0;
+handles.effectIm(1:round(GridThickness/2),:,:)=1;
+handles.effectIm(Height:-1:Height-round(GridThickness/2),:,:)=1;
+% handles.effectIm(:,:,-1::)=0;
 
 % handles.effectIm(1:100,1:100,:)=0;hGrid
 
@@ -600,127 +621,6 @@ Transform;%Transformed the effectIm to the real project Im.
 Refresh;
 
 guidata(hObject,handles);
-
-
-
-function SpotSize_Callback(hObject, eventdata, handles)
-% hObject    handle to SpotSize (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of SpotSize as text
-%        str2double(get(hObject,'String')) returns contents of SpotSize as a double
-handles.spotSize=str2double(get(hObject,'string'));
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function SpotSize_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to SpotSize (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function SpotHeight_Callback(hObject, eventdata, handles)
-% hObject    handle to SpotHeight (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of SpotHeight as text
-%        str2double(get(hObject,'String')) returns contents of SpotHeight as a double
-handles.spotHeight=str2double(get(hObject,'string'));
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function SpotHeight_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to SpotHeight (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function SpotSepDegrees_Callback(hObject, eventdata, handles)
-% hObject    handle to SpotSepDegrees (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of SpotSepDegrees as text
-%        str2double(get(hObject,'String')) returns contents of SpotSepDegrees as a double
-handles.spotSeperateDegrees=str2double(get(hObject,'string'));
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function SpotSepDegrees_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to SpotSepDegrees (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function SpotNumber_Callback(hObject, eventdata, handles)
-% hObject    handle to SpotNumber (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of SpotNumber as text
-%        str2double(get(hObject,'String')) returns contents of SpotNumber as a double
-handles.spotNumber=str2double(get(hObject,'string'));
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function SpotNumber_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to SpotNumber (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in SpotOrder.
-function SpotOrder_Callback(hObject, eventdata, handles)
-% hObject    handle to SpotOrder (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns SpotOrder contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from SpotOrder
-handles.spotOrder=get(hObject,'value');
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function SpotOrder_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to SpotOrder (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-set(hObject,'string',{'Random Order','Increasing Order','Decreasing Order'});
 
 
 % --- Executes during object creation, after setting all properties.
@@ -739,7 +639,7 @@ function Z0_Callback(hObject, eventdata, handles)
 handles.z0=str2num(get(hObject,'String'));
 % Hints: get(hObject,'String') returns contents of Z0 as text
 %        str2double(get(hObject,'String')) returns contents of Z0 as a double
-Transform;
+BackGroundTailor;
 Refresh;
 guidata(hObject,handles);
 
@@ -765,6 +665,7 @@ function Gamma_Callback(hObject, eventdata, handles)
 handles.gamma=str2num(get(hObject,'String'));
 % Hints: get(hObject,'String') returns contents of Gamma as text
 %        str2double(get(hObject,'String')) returns contents of Gamma as a double
+PreTransform;
 Transform;
 Refresh;
 guidata(hObject,handles);
@@ -788,66 +689,61 @@ function GenerateMovie_Callback(hObject, eventdata, handles)
 % hObject    handle to GenerateMovie (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-[Filename,Filepath,FilterIndex]=uiputfile('*.mat','Save as','Movie1.mat');
+[RawFilename,RawFilepath,RawFilterIndex]=uigetfile([pwd,'\RawMovie\*.mat'],'Input raw movie','plainMovie.mat');
+[Filename,Filepath,FilterIndex]=uiputfile([pwd,'\Movie\*.mat'],'Save as','Movie1.mat');
+addpath(genpath([pwd,'\PlainPainter\']));
 if(Filename==0)
     return;
 end
-display('Movie Generated begin, wait until succeed.')
+if(RawFilename==0)
+    display('Movie generated by PlainPainter GUI.');
+    RawMovie = PlainPainter(handles);
+
+else
+    display('Read the Raw Movie...')
+    RawMovie = load([RawFilepath,RawFilename]);
+    
+end
+if(isfield(RawMovie,'PlainMovieInfo'))
+    if(~isempty(RawMovie.PlainMovieInfo))
+    PlainMovieInfo = RawMovie.PlainMovieInfo;%Get the Parameters which is used for generating the plain movie, for further use.
+    handles.freshRate = PlainMovieInfo.FreshRate;
+    set(handles.FreshRate,'String',num2str(handles.freshRate));
+    end
+else
+    PlainMovieInfo =[];
+end
+handles.totalFrames = size(RawMovie.plainMovie,4);  
+display('Movie Transformation begin, wait until succeed.')
 tstart=tic();
 Height=ceil(handles.stripHeight/handles.stripHeightResolution)+1;
 Width=ceil(handles.stripWidth/handles.stripWidthResolution)+1;
 %Test if the image is out of boundary
-if((handles.spotNumber-1)*handles.spotSeperateDegrees+handles.spotSize*2<180&&handles.spotSize*handles.dishRadius*2*pi/180<handles.stripHeight)
-handles.totalFrames=((handles.spotNumber-1)*handles.spotInterval+handles.spotNumber*handles.spotOnTime)*handles.frames;
 CurrentNum=handles.movieNum+1;
-handles.movieStore(1).RawMovie{CurrentNum}=ones(Height,Width,3);
+handles.movieStore(1).RawMovie{CurrentNum}=RawMovie.plainMovie;
 handles.movieStore(1).Movie{CurrentNum}=zeros(handles.fieldHeight,handles.fieldWidth,3,handles.totalFrames,'uint8');
 %Construct the spot or the bar
-handles.object=[];
-switch handles.spotOrder
-    case handles.g_RandomOrder
-        Order=randperm(handles.spotNumber);
-    case handles.g_IncreasingOrder
-        Order=1:handles.spotNumber;
-    case handles.g_DecreasingOrder
-        Order=handles.spotNumber:-1:1;
-end
-SpotX=(handles.stripWidth-(handles.spotNumber-1)*handles.spotSeperateDegrees)/2:handles.spotSeperateDegrees:(handles.stripWidth+(handles.spotNumber-1)*handles.spotSeperateDegrees)/2;
-SpotY=ones(1,handles.spotNumber)*handles.spotHeight;
-OrderFrame=zeros(1,handles.totalFrames);
-Duration=handles.spotOnTime+handles.spotInterval;
-for i=1:handles.spotNumber
-
-    if (i==handles.spotNumber)
-        OrderFrame(Duration*handles.frames*(i-1)+1:1:handles.totalFrames)=Order(i);
-    else
-        OrderFrame(Duration*handles.frames*(i-1)+1:1:Duration*handles.frames*(i-1)+handles.spotOnTime*handles.frames)=Order(i);
-        OrderFrame(Duration*handles.frames*(i-1)+handles.spotOnTime*handles.frames+1:1:Duration*handles.frames*i)=0;
-    end
-    
-end
-GenObject;%Generate the object e.g. solid/checkerboard spot/bar
-for i=1:3
-    handles.movieStore.RawMovie{CurrentNum}(:,:,i)=handles.backGroundColor(i)*255;
-end
 
 for CurrentFrame=1:handles.totalFrames
-    handles.effectIm=[];
+    handles.effectIm=handles.movieStore(1).RawMovie{CurrentNum}(:,:,:,CurrentFrame);
     handles.patternIm=[];
-    GenMovie;
-    if(CurrentFrame>1)&& isequal(handles.movieStore.RawMovie{CurrentNum},handles.effectIm)
+    if(CurrentFrame>1)&& isequal(handles.movieStore.RawMovie{CurrentNum}(:,:,:,CurrentFrame-1),handles.effectIm)
 %     if isequal(handles.movieStore.RawMovise{CurrentNum},handles.effectIm)
             handles.movieStore.Movie{CurrentNum}(:,:,:,CurrentFrame)=handles.movieStore.Movie{CurrentNum}(:,:,:,CurrentFrame-1);
     else
             Transform;
             handles.movieStore.Movie{CurrentNum}(:,:,:,CurrentFrame)=handles.patternIm;
     end
-    handles.movieStore.RawMovie{CurrentNum}=handles.effectIm;
 end
 display('Movie generated successfully! Check the overlap.');
 TempMovie=handles.movieStore.Movie{CurrentNum};
+PlainMovie = RawMovie.PlainMovie;
 delete([Filepath,Filename]);
-save([Filepath,Filename],'TempMovie','-v7.3');
+% MovieParameters = PlainMovieParameters;
+MovieInfo = PlainMovieInfo;
+ops = struct('algorithm', 'greedy'); 
+save([Filepath,Filename],'-v7.3','ops','TempMovie','MovieInfo');
+save([Filepath,'PlainMovie-',Filename],'-v7.3','ops','PlainMovie','PlainMovieInfo')
 HashID=GetMD5(TempMovie,'bin');
 MovieOverlap=0;
 if (handles.movieNum>0)
@@ -869,14 +765,8 @@ else
     handles.movieStore.Movie(CurrentNum)=[];
     delete([Filepath,Filename]);
 end
-else
-    display('---------------------------------------');
-    display('Error! The spot is out of the boundary.');
-    display('---------------------------------------');
-end
 toc(tstart);
 guidata(hObject,handles);
-
 
 
 % --- Executes on selection change in MoviePool.
@@ -957,7 +847,6 @@ function Load_Callback(hObject, eventdata, handles)
 % hObject    handle to Load (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 [Filename,Filepath]=uigetfile('*.mat','Pick a Movie.','');
 if(Filename==0)
     return;
@@ -1107,7 +996,49 @@ function Play_Callback(hObject, eventdata, handles)
 % hObject    handle to Play (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+tstart = GetSecs;
+[m,n]=size(handles.movieList);
+refresh = Screen('GetFlipInterval', handles.win1);
+backGroundTextureIndex=Screen('MakeTexture', handles.win1, handles.backGroundIm);
+Screen('DrawTexture', handles.win1, backGroundTextureIndex);
+TimeStamp=Screen('Flip', handles.win1);
+TimeStamp=TimeStamp + handles.baselineDuration - 0.5 * refresh;
+for i = 1:n
+    MovieIndex=find(ismember(handles.movieStore.HashID,handles.movieList{i}));
+    refresh = Screen('GetFlipInterval', handles.win1);
+    % Synchronize to retrace at start of trial/animation loop:
+     handles.totalFrames=size(handles.movieStore.Movie{MovieIndex},4);
+     handles.patternIm=handles.movieStore.Movie{MovieIndex}(:,:,:,1);
+    % vbl = Screen('Flip', handles.win1);
+    % Loop: Cycle through 300 images:
+    Period=1/refresh/handles.frames;
+    if Period-floor(Period)>0.01
+        display('Warning!The fresh frequency is not matching the frames or the multipe of frames.')
+    end
+    Period=round(Period);
+    TimeStamp =TimeStamp - (Period-0.5)*refresh; %To make up the additional Timestamp time added in the first frame
+    for i=1:handles.totalFrames
+    % Draw i'th image to backbuffer:
+     handles.patternIm=handles.movieStore.Movie{MovieIndex}(:,:,:,i);
+    patternTextureIndex=Screen('MakeTexture', handles.win1, handles.patternIm);
+    Screen('DrawTexture', handles.win1, patternTextureIndex);
+    TimeStamp = TimeStamp + (Period-0.5)*refresh;
+    TimeStamp=Screen('Flip', handles.win1,TimeStamp);
+    clear patternTextureIndex;
+    % Screen('DrawTexture', win, myImage(i));
+    % Show images exactly 2 refresh cycles apart of each other:
+    % vbl = Screen('Flip', win, vbl + (2 - 0.5) * refresh);
+    % Keyboard checks, whatever... Next loop iteration.
+    end
+    backGroundTextureIndex=Screen('MakeTexture', handles.win1, handles.backGroundIm);
+    Screen('DrawTexture', handles.win1, backGroundTextureIndex);
+    TimeStamp=Screen('Flip', handles.win1,TimeStamp + (Period-0.5)*refresh);
+    TimeStamp = TimeStamp + handles.movieInterval - 0.5 * refresh;
+end
+TimeStamp = TimeStamp + handles.endbaselineDuration - 0.5 * refresh;
+backGroundTextureIndex=Screen('MakeTexture', handles.win1, handles.backGroundIm);
+Screen('DrawTexture', handles.win1, backGroundTextureIndex);
+Screen('Flip', handles.win1,TimeStamp);
 guidata(hObject,handles);
 
 
@@ -1191,150 +1122,6 @@ end
 
 
 
-function SpotOnTime_Callback(hObject, eventdata, handles)
-% hObject    handle to SpotOnTime (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of SpotOnTime as text
-%        str2double(get(hObject,'String')) returns contents of SpotOnTime as a double
-handles.spotOnTime=str2double(get(hObject,'string'));
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function SpotOnTime_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to SpotOnTime (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit27_Callback(hObject, eventdata, handles)
-% hObject    handle to edit27 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit27 as text
-%        str2double(get(hObject,'String')) returns contents of edit27 as a double
-handles.spotInterval=str2double(get(hObject,'string'));
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function edit27_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit27 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in Entity.
-function Entity_Callback(hObject, eventdata, handles)
-% hObject    handle to Entity (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns Entity contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from Entity
-handles.entity=get(hObject,'value');
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function Entity_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Entity (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-set(hObject,'string',{'Spot','Bar'});
-
-
-% --- Executes on selection change in Surface.
-function Surface_Callback(hObject, eventdata, handles)
-% hObject    handle to Surface (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns Surface contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from Surface
-handles.surface=get(hObject,'value');
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function Surface_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Surface (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-set(hObject,'string',{'Solid','Checkerboard'});
-
-
-% --- Executes on selection change in Movement.
-function Movement_Callback(hObject, eventdata, handles)
-% hObject    handle to Movement (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns Movement contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from Movement
-handles.movement=get(hObject,'value');
-guidata(hObject,handles);
-
-% --- Executes during object creation, after setting all properties.
-function Movement_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Movement (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-% See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-set(hObject,'string',{'Horizontal','Vertical'});
-
-
-
-function Frames_Callback(hObject, eventdata, handles)
-% hObject    handle to Frames (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of Frames as text
-%        str2double(get(hObject,'String')) returns contents of Frames as a double
-handles.frames=str2double(get(hObject,'String'));
-guidata(handles,hObject);
-
-% --- Executes during object creation, after setting all properties.
-function Frames_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Frames (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 
 
@@ -1410,6 +1197,7 @@ for i=1:handles.totalFrames
 patternTextureIndex=Screen('MakeTexture', handles.win1, handles.patternIm);
 Screen('DrawTexture', handles.win1, patternTextureIndex);
 TimeStamp=Screen('Flip', handles.win1,TimeStamp+(Period-0.5)*refresh);
+clear patternTextureIndex;
 % Screen('DrawTexture', win, myImage(i));
 % Show images exactly 2 refresh cycles apart of each other:
 % vbl = Screen('Flip', win, vbl + (2 - 0.5) * refresh);
