@@ -16,3 +16,8 @@ handles.stripWidth = 180;
 
 
 Test = PlainPainter(handles);
+figure;
+for i = 1:20
+    imagesc(Test.plainMovie(:,:,:,i));
+    pause(1);
+end

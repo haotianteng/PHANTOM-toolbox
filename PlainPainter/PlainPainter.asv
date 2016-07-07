@@ -34,8 +34,6 @@ classdef PlainPainter < handle
     BarsText
     BarsTextHandles
     Bars
-    MeshX;
-    MeshY;
     %Parameter. The data is stored in spotsProperties, and the handles of
     %each uicontrols in spot panel is stored in spotsHandles, and spotsText
     %is used for presenting the text on the UI interface.
@@ -634,13 +632,13 @@ classdef PlainPainter < handle
                         this.Spots{i}.XCoor(OnTime) = linspace(this.SpotsProperties.XBegin(i),this.SpotsProperties.XEnd(i),Len);
                         this.Spots{i}.YCoor(OnTime) = linspace(this.SpotsProperties.YBegin(i),this.SpotsProperties.YEnd(i),Len);
                     case 'Trail'
-                        this.Spots{i}.XCoor(OnTime) = this.SpotsProperties.XTrailFunction{i}((OnTime-OnTime(1))/this.Frames);
-                        this.Spots{i}.YCoor(OnTime) = this.SpotsProperties.YTrailFunction{i}((OnTime-OnTime(1))/this.Frames);
+                        this.Spots{i}.XCoor(OnTime) = this.SpotsProperties.XTrailFunction{i}((OnTime-OnTime(1))/30);
+                        this.Spots{i}.YCoor(OnTime) = this.SpotsProperties.YTrailFunction{i}((OnTime-OnTime(1))/30);
                 end
                 
                 for k = 1:length(this.SpotsProperties.Repeat{i})
                     if(this.SpotsProperties.Repeat{i}(k)>0)
-                    Latency = round((this.SpotsProperties.Repeat{i}(k)+this.SpotsProperties.OnBegin(i))*this.Frames)+1;
+                    Latency = round((this.SpotsProperties.Repeat{i}(k)+this.SpotsProperties.OnBegin(i))*30)+1;
                     LatencyOnTime = OnTime - OnTime(1) + Latency;
                     this.Spots{i}.XCoor(LatencyOnTime) = this.Spots{i}.XCoor(OnTime);
                     this.Spots{i}.YCoor(LatencyOnTime) = this.Spots{i}.YCoor(OnTime);
@@ -714,12 +712,13 @@ classdef PlainPainter < handle
             PlainMovie(:,:,2,:)=this.ProjectorHandles.backGroundColor(2)*255;
             PlainMovie(:,:,3,:)=this.ProjectorHandles.backGroundColor(3)*255;
             Color = [0,0,0];
-            [this.MeshX,this.MeshY] = meshgrid((-stripWidth/2:stripWidthResolution:stripWidth/2)*this.WHRatio,(-stripHeight/2:stripHeightResolution:stripHeight/2));
+            Period = (this.BarsProperties.SeperateDegrees) / this.BarsProperties.Speed;
             for j = 1:this.TotalFrames
                 Bars = false(Height , Width);
-                StartPhase = rem(this.BarsProperties.Phase * this.BarsProperties.SeperateDegrees / 360 + (j-1)/this.Frames * this.BarsProperties.Speed - this.BarsProperties.Width,this.BarsProperties.SeperateDegrees);
-                for Displacement = StartPhase - this.BarsProperties.SeperateDegrees : this.BarsProperties.SeperateDegrees:180+this.BarsProperties.SeperateDegrees
+                j*this.
+                for Displacement = StartPhase : this.BarsProperties.SeperateDegrees:180+this.BarsProperties.SeperateDegrees
                     Time = Displacement/this.BarsProperties.Speed;
+                    Time = rem(Time,Period);
                     CurrentBar = this.MovingBarPatternFunction(this.BarsProperties.Width,this.BarsProperties.Speed,this.BarsProperties.Direction,Time);
                     Bars = or(Bars,CurrentBar);
                 end
@@ -805,6 +804,7 @@ classdef PlainPainter < handle
             %Direnction is described in angle alpha, 90 > alpha > 0. BarWidth,Width unit in
             %angle too.Moving speed unit in mm/s. Time unit in seconds.Time
             %should be input in the unit of second.
+            BarSeperateDegrees = this.BarsProperties.SeperateDegrees;
 %             BackGroundColor=this.ProjectorHandles.backGroundColor; %Blue background.
             stripHeight = this.ProjectorHandles.stripHeight;
             stripWidth = this.ProjectorHandles.stripWidth;
@@ -816,7 +816,8 @@ classdef PlainPainter < handle
             Direction = Direction * pi / 180;
             WHRatio = 1/180*pi*Radius;
             BarWidth = BarWidth * WHRatio; %Transfer the barwidth into mm.
-            BarMask = abs(cos(Direction)*this.MeshX+sin(Direction)*this.MeshY+Height / 2 * sin(Direction) + Radius * Width /180 * pi* cos(Direction) - MovingSpeed*WHRatio * Time) < BarWidth;
+            [x,y] = meshgrid((-stripWidth/2:XResolution:stripWidth/2)*WHRatio,(-stripHeight/2:YResolution:stripHeight/2));
+            BarMask = abs(cos(Direction)*x+sin(Direction)*y+Height / 2 * sin(Direction) + Radius * Width /180 * pi* cos(Direction) - MovingSpeed*WHRatio * Time) < BarWidth;
 
             
         end

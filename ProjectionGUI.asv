@@ -1239,9 +1239,8 @@ refresh = Screen('GetFlipInterval', handles.win1);
  handles.totalFrames=size(handles.movieStore.Movie{MovieIndex},4);
  handles.patternIm=handles.movieStore.Movie{MovieIndex}(:,:,:,1);
  try 
-     handles.frames = handles.movieStore.MovieInfo{MovieIndex}.PlainMovieInfo.FreshRate;
- catch error
-     display(error.message);
+     handles.frames = handles.movieStore.MovieInfo{MovieIndex}.PlainMovieInfo.FreshRate
+ catch
  end
  Refresh;
 % vbl = Screen('Flip', handles.win1);
