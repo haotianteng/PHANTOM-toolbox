@@ -73,6 +73,8 @@ set(handles.WidthStrip,'String','180');%stripWidth is in degree unit.
 set(handles.HeightStrip,'String','10');
 set(handles.PhysicalHeight,'String','60');
 set(handles.PhysicalWidth,'String','80');
+set(handles.StripHeightResolution,'String','0.01');
+set(handles.StripWidthResolution,'String','0.1');
 handles.physicalHeight=60;
 handles.physicalWidth=80;
 handles.stripHeight=10;
@@ -1213,7 +1215,7 @@ function StripHeightResolution_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of StripHeightResolution as text
 %        str2double(get(hObject,'String')) returns contents of StripHeightResolution as a double
-handles.stripHeightResolution=str2double(get(HoBject,'String'));
+handles.stripHeightResolution=str2double(get(hObject,'String'));
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -1237,7 +1239,7 @@ function StripWidthResolution_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of StripWidthResolution as text
 %        str2double(get(hObject,'String')) returns contents of StripWidthResolution as a double
-handles.stripWidthResolution=get(hObejct,'String');
+handles.stripWidthResolution=str2double(get(hObject,'String'));
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
