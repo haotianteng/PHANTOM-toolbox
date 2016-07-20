@@ -24,14 +24,18 @@ handles.cylindricalCoordinate(:,:,1)=handles.cylindricalCoordinate(:,:,1)./360.*
 R=handles.dishRadius;
 D=handles.distance;
 Hratio=handles.fieldHeight/handles.physicalHeight*D;
-Wratio=handles.fieldWidth/handles.physicalWidth*D;%60 and 104 is the General length of the projector image
+Wratio=handles.fieldWidth/handles.physicalWidth*D;%60 and 80 is the General length of the projector image
 
 
 
 
-handles.bodyCoordinate(:,:,1)=R+D-R.*sin(handles.cylindricalCoordinate(:,:,1));
+handles.bodyCoordinate(:,:,1)=D*d0(1)-R.*sin(handles.cylindricalCoordinate(:,:,1));
 handles.bodyCoordinate(:,:,2)=y0+R.*cos(handles.cylindricalCoordinate(:,:,1));
 handles.bodyCoordinate(:,:,3)=z0-handles.cylindricalCoordinate(:,:,2);
+%Body coordinate of the porject image (x,y,z). x is
+%bodyCoordinate(:,:,1), y is bodyCoordinate(:,:,2),
+%z is bodyCoordinate(:,:,3). The coordinate schema can
+%be found at the appendix in the userguide.All unit in mm.
 
 
 handles.patternIm=handles.backGroundIm;
@@ -59,7 +63,10 @@ dH=dx*d0(1)+dy*d0(2)+dz*d0(3);
 %         handles.projectCoordinate(:,:,2)=(ey(1)*(dx-dH*d0(1))+ey(2)*(dy-dH*d0(2))+ey(3)*(dz-dH*d0(3)))./dH*ratio*1.5;
           handles.projectCoordinate(:,:,1)=(ex(1)*(dx-dH*d0(1))+ex(2)*(dy-dH*d0(2))+ex(3)*(dz-dH*d0(3)))./dH*Wratio;
           handles.projectCoordinate(:,:,2)=(ey(1)*(dx-dH*d0(1))+ey(2)*(dy-dH*d0(2))+ey(3)*(dz-dH*d0(3)))./dH*Hratio;
-
+          %projectCoordinate are unit in pixels, which represented the
+          %mapping coordinate of the cylinder coordinate.Schema can be
+          %found in the appendix of the user guide.
+          
 % effectIm=permute(handles.effectIm,[3,1,2]);
 % for i=1:Height
 %     for j=1:Width

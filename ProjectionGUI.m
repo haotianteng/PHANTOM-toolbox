@@ -10,14 +10,27 @@ function varargout = ProjectionGUI(varargin)
 %      function named CALLBACK in PROJECTIONGUI.M with the given input arguments.
 %
 %      PROJECTIONGUI('Property','Value',...) creates a new PROJECTIONGUI or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
+%      existing singleton*.  Starting from the left, ¡¤property value pairs are
 %      applied to the GUI before ProjectionGUI_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
 %      stop.  All inputs are passed to ProjectionGUI_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
-%
+%Copyright (c) 2016, Haotian Teng rights reserved.
+%     
+% ZerbrafishProject is free software: you can redistribute it and/or modify
+%     it under the terms of the GNU General Public License as published by
+%     the Free Software Foundation, either version 3 of the License, osr
+%     (at your option) any later version.
+% 
+% ZerbrafishProject is distributed in the hope that it will be useful,
+%     but WITHOUT ANY WARRANTY; without even the implied warranty of
+%     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%     GNU General Public License for more details.
+% 
+% You should have received a copy of the GNU General Public License
+%     along with ZerbrafishProject.  If not, see <http://www.gnu.org/licenses/>.
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
 % Edit the above text to modify the response to help ProjectionGUI
@@ -147,7 +160,7 @@ function Distance_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of Distance as text
 %        str2double(get(hObject,'String')) returns contents of Distance as a double
 handles.distance=str2double(get(hObject,'String'));
-guidata(handles,hObject);
+guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
 function Distance_CreateFcn(hObject, eventdata, handles)
@@ -412,7 +425,7 @@ function DishRadius_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of DishRadius as text
 %        str2double(get(hObject,'String')) returns contents of DishRadius as a double
 handles.dishRadius=str2double(get(hObject,'String'));
-guidata(handles,hObject);
+guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
 function DishRadius_CreateFcn(hObject, eventdata, handles)
@@ -643,8 +656,8 @@ function Z0_Callback(hObject, eventdata, handles)
 handles.z0=str2num(get(hObject,'String'));
 % Hints: get(hObject,'String') returns contents of Z0 as text
 %        str2double(get(hObject,'String')) returns contents of Z0 as a double
-BackGroundTailor;
-Refresh;
+% BackGroundTailor;
+% Refresh;
 guidata(hObject,handles);
 
 
@@ -666,12 +679,12 @@ function Gamma_Callback(hObject, eventdata, handles)
 % hObject    handle to Gamma (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-handles.gamma=str2num(get(hObject,'String'));
+handles.gamma=str2double(get(hObject,'String'));
 % Hints: get(hObject,'String') returns contents of Gamma as text
 %        str2double(get(hObject,'String')) returns contents of Gamma as a double
-PreTransform;
-Transform;
-Refresh;
+% PreTransform;
+% Transform;
+% Refresh;
 guidata(hObject,handles);
 
 
@@ -1013,15 +1026,15 @@ function Play_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 tstart = GetSecs;
 [m,n]=size(handles.movieList);
-
 %%%%%%%%%%%%%Trigger1
 if ~isempty(handles.IO.Session)
     Trigger(handles.IO.Session,1,1);
-%     pause(1); Used for the Test.
+%     display('Trigger1 is on.');
+%     pause(0.5); %Used for the Test.
     Trigger(handles.IO.Session,1,0)
+%     display(['Trigger1 is off.',' Trigger last for',num2str(TriggerOffTime-TriggerOnTime),'Seconds']);
 end
 %%%%%%%%%%%%%%
-
 refresh = Screen('GetFlipInterval', handles.win1);
 backGroundTextureIndex=Screen('MakeTexture', handles.win1, handles.backGroundIm);
 Screen('DrawTexture', handles.win1, backGroundTextureIndex);
@@ -1062,16 +1075,28 @@ for i = 1:n
         if ~isempty(handles.IO.Session)
         if i==1 && CurrentSizeTrail(i)>0
         Trigger(handles.IO.Session,2,1);
+        Trigger(handles.IO.Session,2,0);
         Trigger2 = 1;
-        elseif CurrentSizeTrail(i)>0 && CurrentSizeTrail(i-1)==0
+        elseif CurrentSizeTrail(i)>0 && CurrentSizeTrail(i-1)==0 &&Trigger2 == 0
             Trigger(handles.IO.Session,2,1);
+            display('111')
+            Trigger(handles.IO.Session,2,0);
+            GetSecs - tstart
+            display('222')
             Trigger2 = 1;
-        elseif CurrentSizeTrail(i)==0 && CurrentSizeTrail(i-1) > 0
+            display('Trigger2 is on.');
+            CurrentSizeTrail(i)
+            CurrentSizeTrail(i-1)
+%             GetSecs - tstart
+        elseif CurrentSizeTrail(i)==0 && CurrentSizeTrail(i-1) > 0&&Trigger2 == 1
+%             Trigger(handles.IO.Session,2,1);  
             Trigger(handles.IO.Session,2,0);
             Trigger2 = 0;
         end
         end
     end
+    
+    
     %%%%%%%%%%%%%%
     clear patternTextureIndex;
     % Screen('DrawTexture', win, myImage(i));
@@ -1189,7 +1214,7 @@ function StripHeightResolution_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of StripHeightResolution as text
 %        str2double(get(hObject,'String')) returns contents of StripHeightResolution as a double
 handles.stripHeightResolution=str2double(get(HoBject,'String'));
-guidata(handles,hObject);
+guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
 function StripHeightResolution_CreateFcn(hObject, eventdata, handles)
@@ -1213,7 +1238,7 @@ function StripWidthResolution_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of StripWidthResolution as text
 %        str2double(get(hObject,'String')) returns contents of StripWidthResolution as a double
 handles.stripWidthResolution=get(hObejct,'String');
-guidata(handles,hObject);
+guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
 function StripWidthResolution_CreateFcn(hObject, eventdata, handles)
@@ -1298,10 +1323,10 @@ function PhysicalHeight_Callback(hObject, eventdata, handles)
 % hObject    handle to PhysicalHeight (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+handles.physicalHeight = str2double(get(hObject,'String'));
 % Hints: get(hObject,'String') returns contents of PhysicalHeight as text
 %        str2double(get(hObject,'String')) returns contents of PhysicalHeight as a double
-
+guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
 function PhysicalHeight_CreateFcn(hObject, eventdata, handles)
@@ -1321,10 +1346,10 @@ function PhysicalWidth_Callback(hObject, eventdata, handles)
 % hObject    handle to PhysicalWidth (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+handles.physicalWidth = str2double(get(hObject,'String'));
 % Hints: get(hObject,'String') returns contents of PhysicalWidth as text
 %        str2double(get(hObject,'String')) returns contents of PhysicalWidth as a double
-
+guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
 function PhysicalWidth_CreateFcn(hObject, eventdata, handles)
