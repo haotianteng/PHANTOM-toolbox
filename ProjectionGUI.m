@@ -1075,11 +1075,11 @@ for i = 1:n
     %%%%%%%%%%%%%Trigger2
     if exist('CurrentSizeTrail','var') %CurrentSizeTrail generated from the CheckMovieInfo script.
         if ~isempty(handles.IO.Session)
-        if i==1 && CurrentSizeTrail(i)>0
+        if i==1 && sum(CurrentSizeTrail(:,i))>0
         Trigger(handles.IO.Session,2,1);
         Trigger(handles.IO.Session,2,0);
         Trigger2 = 1;
-        elseif CurrentSizeTrail(i)>0 && CurrentSizeTrail(i-1)==0 &&Trigger2 == 0
+        elseif sum(CurrentSizeTrail(:,i))>0 && sum(CurrentSizeTrail(:,i-1))==0 &&Trigger2 == 0
             Trigger(handles.IO.Session,2,1);
             display('111')
             Trigger(handles.IO.Session,2,0);
@@ -1087,10 +1087,10 @@ for i = 1:n
             display('222')
             Trigger2 = 1;
             display('Trigger2 is on.');
-            CurrentSizeTrail(i)
-            CurrentSizeTrail(i-1)
+            CurrentSizeTrail(:,i)
+            CurrentSizeTrail(:,i-1)
 %             GetSecs - tstart
-        elseif CurrentSizeTrail(i)==0 && CurrentSizeTrail(i-1) > 0&&Trigger2 == 1
+        elseif sum(CurrentSizeTrail(:,i))==0 && sum(CurrentSizeTrail(:,i-1)) > 0&&Trigger2 == 1
 %             Trigger(handles.IO.Session,2,1);  
             Trigger(handles.IO.Session,2,0);
             Trigger2 = 0;
@@ -1287,20 +1287,7 @@ patternTextureIndex=Screen('MakeTexture', handles.win1, handles.patternIm);
 Screen('DrawTexture', handles.win1, patternTextureIndex);
 TimeStamp=Screen('Flip', handles.win1,TimeStamp+(Period-0.5)*refresh);
 %%%%%%%%%%%%%Trigger2
-if exist('CurrentSizeTrail','var') %CurrentSizeTrail generated from the CheckMovieInfo script.
-    if ~isempty(handles.IO.Session)
-    if i==1 && CurrentSizeTrail(i)>0
-    Trigger(handles.IO.Session,2,1);
-    Trigger2 = 1;
-    elseif CurrentSizeTrail(i)>0 && CurrentSizeTrail(i-1)==0
-        Trigger(handles.IO.Session,2,1);
-        Trigger2 = 1;
-    elseif CurrentSizeTrail(i)==0 && CurrentSizeTrail(i-1) > 0
-        Trigger(handles.IO.Session,2,0);
-        Trigger2 = 0;
-    end
-    end
-end
+SpotOnTrigger;
 %%%%%%%%%%%%%%
 clear patternTextureIndex;
 % Screen('DrawTexture', win, myImage(i));
@@ -1342,7 +1329,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
+function figure1_DeleteFcn(hObject,eventdata,handles)
 
 function PhysicalWidth_Callback(hObject, eventdata, handles)
 % hObject    handle to PhysicalWidth (see GCBO)

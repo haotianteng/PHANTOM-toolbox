@@ -504,9 +504,9 @@ classdef PlainPainter < handle
                    num2str(this.SpotsProperties.OnEnd(this.SpotsProperties.Index)-this.SpotsProperties.OnBegin(this.SpotsProperties.Index))]);
                XTrailFunction = input(['Please input a function to calculate the X(t) for the Spot ',num2str(this.SpotsProperties.Index),', for example:\n X(t)=sin(t) \n X(t)='],'s');
                YTrailFunction = input(['Please input a function to calculate the Y(t) for the Spot ',num2str(this.SpotsProperties.Index),', for example:\n Y(t)=cos(t) \n Y(t)='],'s');
+               this.SpotsProperties.XTrailFunction{this.SpotsProperties.Index} = str2func(['@(t)',XTrailFunction]);
+               this.SpotsProperties.YTrailFunction{this.SpotsProperties.Index} = str2func(['@(t)',YTrailFunction]);
             end
-            this.SpotsProperties.XTrailFunction{this.SpotsProperties.Index} = str2func(['@(t)',XTrailFunction]);
-            this.SpotsProperties.YTrailFunction{this.SpotsProperties.Index} = str2func(['@(t)',YTrailFunction]);
         end
         
         function SpotsXBegin_Callback(this,src,eventdata)
@@ -696,7 +696,7 @@ classdef PlainPainter < handle
             plainMovie(:,:,2,:)=this.ProjectorHandles.backGroundColor(2)*255;
             plainMovie(:,:,3,:)=this.ProjectorHandles.backGroundColor(3)*255;
             for i = 1:spotNumber    
-
+                this.SpotsProperties.Index = i;
                 for j = 1:this.TotalFrames        
                     SpotSize = this.Spots{i}.SizeTrail(j);
 
