@@ -83,9 +83,9 @@ handles.stripHeightResolution=0.01;
 handles.stripWidthResolution=0.1;
 handles.distance=224;
 set(handles.Distance,'String',num2str(handles.distance));
-handles.z0=5;%-17; %the dishes is 22 mm under the horizontal line, and calcualte from the
+handles.z0=-17; %the dishes is 22 mm under the horizontal line, and calcualte from the
 set(handles.Z0,'String',num2str(handles.z0));
-handles.gamma=0;%-5.6;
+handles.gamma=-5.6;
 set(handles.Gamma,'String',num2str(handles.gamma));
 handles.win1=0;
 handles.backGroundColor=[0,0,1];
@@ -1113,19 +1113,16 @@ for i = 1:n
     %%%%%%%%%%%%%%
     Trigger2 = 0;    
     
-    if handles.movieInterval>0
     backGroundTextureIndex=Screen('MakeTexture', handles.win1, handles.backGroundIm);
     Screen('DrawTexture', handles.win1, backGroundTextureIndex);
     TimeStamp=Screen('Flip', handles.win1,TimeStamp + (Period-0.5)*refresh);
     TimeStamp = TimeStamp + handles.movieInterval - 0.5 * refresh;
     clear backGroundTextureIndex;
-    end
 end
 TimeStamp = TimeStamp + handles.endbaselineDuration - 0.5 * refresh;
 backGroundTextureIndex=Screen('MakeTexture', handles.win1, handles.backGroundIm);
 Screen('DrawTexture', handles.win1, backGroundTextureIndex);
 Screen('Flip', handles.win1,TimeStamp);
-clear backGroundTextureIndex;
 guidata(hObject,handles);
 
 

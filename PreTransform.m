@@ -11,7 +11,7 @@ mindegree=0;
 handles.cylindricalCoordinate=zeros(Height,Width,2);%first is the Theta coordinate, and the next one is relative Z coordinate
 handles.projectCoordinate=zeros(Height,Width,2);%first is the X ,second is the Y
 handles.bodyCoordinate=zeros(Height,Width,3);%first is the X coordinate, and the next one is Y coordinate and third one is Z coordinate
-%%%GPU Accerelate %%% Need Nvidia GPU installed.
+%%%GPU Accerelate Uncomment these lines if want to use GPU to calculate%%% Need Nvidia GPU and CUDA installed.
 % % handles.bodyCoordinate=gpuArray(single(handles.bodyCoordinate));
 % % handles.cylindricalCoordinate=gpuArray(single(handles.cylindricalCoordinate));
 % % handles.projectCoordinate=gpuArray(single(handles.projectCoordinate));
