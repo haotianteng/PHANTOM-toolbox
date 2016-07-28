@@ -5,7 +5,7 @@ function varargout = ProjectionGUI(varargin)
 %
 %      H = PROJECTIONGUI returns the handle to a new PROJECTIONGUI or the handle to
 %      the existing singleton*.
-%
+%   
 %      PROJECTIONGUI('CALLBACK',hObject,eventData,handles,...) calls the local
 %      function named CALLBACK in PROJECTIONGUI.M with the given input arguments.
 %
@@ -875,6 +875,7 @@ function Load_Callback(hObject, eventdata, handles)
 if(Filename==0)
     return;
 end
+display('Movie Loaded begin ... ...');
 Movie=load([Filepath,Filename]);
 display('Movie Loaded successfully, check overlap.')
 TempMovie=Movie.TempMovie;
@@ -1081,10 +1082,10 @@ for i = 1:n
         Trigger2 = 1;
         elseif sum(CurrentSizeTrail(:,i))>0 && sum(CurrentSizeTrail(:,i-1))==0 &&Trigger2 == 0
             Trigger(handles.IO.Session,2,1);
-            display('111')
+            display('Spot On Trigger Sent Start.')
             Trigger(handles.IO.Session,2,0);
             GetSecs - tstart
-            display('222')
+            display('Spot On Trigger Sent Over.')
             Trigger2 = 1;
             display('Trigger2 is on.');
             CurrentSizeTrail(:,i)
