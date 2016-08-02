@@ -344,16 +344,17 @@ function CustomizedBackGroundColorCheck_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') ret`Qurns toggle state of CustomizedBackGroundColorCheck
+display('Customized background color. The value is between 0 to 1.')
 set(handles.WhiteBackGroundColor,'Value',0);
 set(handles.BlueBackGroundColor,'Value',0);
 set(handles.CustomizedBackGroundColorCheck,'Value',1);
 set(handles.RCustomizedColor,'enable','on');
 set(handles.GCustomizedColor,'enable','on');
 set(handles.BCustomizedColor,'enable','on');
-R=str2num(get(handles.RCustomizedColor,'String'));
-G=str2num(get(handles.GCustomizedColor,'String'));
-B=str2num(get(handles.BCustomizedColor,'String'));
-if(isempty(R)||isempty(G)||isempty(B))
+R=str2double(get(handles.RCustomizedColor,'String'));
+G=str2double(get(handles.GCustomizedColor,'String'));
+B=str2double(get(handles.BCustomizedColor,'String'));
+if(isnan(R)||isnan(G)||isnan(B))
     set(handles.RCustomizedColor,'String','0');
     R=0;
     set(handles.GCustomizedColor,'String','0');
@@ -375,7 +376,14 @@ function GCustomizedColor_Callback(hObject, eventdata, handles)
 % hObject    handle to GCustomizedColor (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+G=str2double(get(hObject,'String'));
+if G>1
+    G=G/255;
+    set(hObject,'String',num2str(G));
+    display('Warning, the max value of green channel is 1, automatically scale from 0-255 to 0-1.');
+end
+handles.backGroundColor(2) = G;
+guidata(hObject,handles);
 % Hints: get(hObject,'String') returns contents of GCustomizedColor as text
 %        str2double(get(hObject,'String')) returns contents of GCustomizedColor as a double
 
@@ -399,7 +407,14 @@ function BCustomizedColor_Callback(hObject, eventdata, handles)
 % hObject    handle to BCustomizedColor (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+B=str2double(get(hObject,'String'));
+if B>1
+    B=B/255;
+    set(hObject,'String',num2str(B));
+    display('Warning, the max value of blue channel is 1, automatically scale from 0-255 to 0-1.');
+end
+handles.backGroundColor(3) = B;
+guidata(hObject,handles);
 % Hints: get(hObject,'String') returns contents of BCustomizedColor as text
 %        str2double(get(hObject,'String')) returns contents of BCustomizedColor as a double
 
@@ -561,7 +576,14 @@ function RCustomizedColor_Callback(hObject, eventdata, handles)
 % hObject    handle to RCustomizedColor (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+R=str2double(get(hObject,'String'));
+if R>1
+    R=R/255;
+    set(hObject,'String',num2str(R));
+    display('Warning, the max value of red channel is 1, automatically scale from 0-255 to 0-1.');
+end
+handles.backGroundColor(1) = R;
+guidata(hObject,handles);
 % Hints: get(hObject,'String') returns contents of RCustomizedColor as text
 %        str2double(get(hObject,'String')) returns contents of RCustomizedColor as a double
 
