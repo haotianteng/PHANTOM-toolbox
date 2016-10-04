@@ -377,8 +377,8 @@ classdef PlainPainter < handle
             OnTime   = this.SpotsOnTime; %default 1s
             this.SpotsProperties.Index = 1;
             Index =1;
-            this.SpotsProperties.RadiusBegin = ones(1,SpotNumber)*1;
-            this.SpotsProperties.RadiusEnd   = ones(1,SpotNumber)*5;
+            this.SpotsProperties.RadiusBegin = ones(1,SpotNumber)*3;
+            this.SpotsProperties.RadiusEnd   = ones(1,SpotNumber)*3;
             this.SpotsProperties.OnBegin     = 0:TimeInterval:TimeInterval*(SpotNumber-1);
             this.SpotsProperties.OnEnd       = (0+OnTime):TimeInterval:(TimeInterval*(SpotNumber-1)+OnTime);
             this.SpotsProperties.Movement    = cell(1,SpotNumber);
@@ -390,8 +390,8 @@ classdef PlainPainter < handle
             this.SpotsProperties.Parameters = cell(1,5); %Used to store the parameters of the pattern function.
             this.SpotsProperties.XBegin      = (180/(SpotNumber+1)):(180/(SpotNumber+1)):(180-(180/(SpotNumber+1)));
             this.SpotsProperties.XEnd        = (180/(SpotNumber+1)):(180/(SpotNumber+1)):(180-(180/(SpotNumber+1)));
-            this.SpotsProperties.YBegin      = ones(1,SpotNumber)*3;
-            this.SpotsProperties.YEnd        =  ones(1,SpotNumber)*7;
+            this.SpotsProperties.YBegin      = ones(1,SpotNumber)*5;
+            this.SpotsProperties.YEnd        =  ones(1,SpotNumber)*5;
             this.TotalTimeUnit = 'Seconds';
             this.SpotsProperties.Repeat =cell(SpotNumber,1);
             [this.SpotsProperties.Repeat{:}] = deal(0);

@@ -469,7 +469,7 @@ Screen('Preference','SkipSyncTests',1)
 win1=Screen('OpenWindow',2);
 handles.flipInterval=Screen('GetFlipInterval',win1);
 handles.freshRate=round(1/handles.flipInterval);
-set(handles.FreshRate,'String',['FreshRate is ',num2str(handles.freshRate),' now']);
+set(handles.FreshRate,'String',['Screen monitor freshRate is ',num2str(handles.freshRate),'.',' Movie fresh rate is ',num2str(handles.frames),'.']);
 [H,W]=Screen('windowsize',win1)
 handles.win1=win1;
 else
@@ -768,6 +768,7 @@ handles.movieStore(1).MovieInfo{CurrentNum} = MovieInfo;
 handles.movieStore(1).PlainMovieInfo{CurrentNum} = PlainMovieInfo;
 %Construct the spot or the bar
 
+display([num2str(handles.totalFrames),' frames to be rendered.']);
 for CurrentFrame=1:handles.totalFrames
     handles.effectIm=handles.movieStore(1).RawMovie{CurrentNum}(:,:,:,CurrentFrame);
     handles.patternIm=[];
@@ -777,6 +778,9 @@ for CurrentFrame=1:handles.totalFrames
     else
             Transform;
             handles.movieStore.Movie{CurrentNum}(:,:,:,CurrentFrame)=handles.patternIm;
+    end
+    if(~mod(CurrentFrame,10))
+    display([num2str(CurrentFrame),'/',num2str(handles.totalFrames)]);
     end
 end
 display('Movie generated successfully! Check the overlap.');
