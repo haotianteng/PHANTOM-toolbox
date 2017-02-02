@@ -118,6 +118,9 @@ handles.moviePool={};%only record the ID of the movie, always synchronize with t
 handles.movieList={};%only record the ID of the movie
 handles.movieNum=0;
 handles.spot=[];
+
+%%%%%%%IO device connection attempt%%%%%%
+% For triggering control,Require Nitional Instrument DAQ toolbox.
 handles.IO = struct('Device',[],'Session',[]);
 try
     
@@ -132,6 +135,8 @@ try
 catch error
     display(error.message);
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 set(handles.GenerateMovie,'enable','off')
 % Update handles structure
 guidata(hObject, handles);
@@ -470,7 +475,7 @@ win1=Screen('OpenWindow',2);
 handles.flipInterval=Screen('GetFlipInterval',win1);
 handles.freshRate=round(1/handles.flipInterval);
 set(handles.FreshRate,'String',['Screen monitor freshRate is ',num2str(handles.freshRate),'.',' Movie fresh rate is ',num2str(handles.frames),'.']);
-[H,W]=Screen('windowsize',win1)
+[H,W]=Screen('windowsize',win1);
 handles.win1=win1;
 else
     win1=handles.win1;
@@ -636,20 +641,20 @@ GridThickness = hGrid(3);
 
 for i=2:hGrid(1)-1
 
-handles.effectIm(:,round((i-1)*(Width-1)/(hGrid(1)-1)-GridThickness/2):1:round(GridThickness/2+(i-1)*(Width-1)/(hGrid(1)-1)),:)=1;
+handles.effectIm(:,round((i-1)*(Width-1)/(hGrid(1)-1)-GridThickness/2):1:round(GridThickness/2+(i-1)*(Width-1)/(hGrid(1)-1)),:)=0;
 
 end
-handles.effectIm(:,1:round(GridThickness/2),:)=1;
-handles.effectIm(:,Width:-1:Width-round(GridThickness/2),:)=1;
+handles.effectIm(:,1:round(GridThickness/2),:)=0;
+handles.effectIm(:,Width:-1:Width-round(GridThickness/2),:)=0;
 
 
 for i=2:hGrid(2)-1
 
-handles.effectIm(1+round((i-1)*(Height-1)/(hGrid(2)-1)-GridThickness/2):1:round(GridThickness/2+(i-1)*(Height-1)/(hGrid(2)-1)),:,:)=1;
+handles.effectIm(1+round((i-1)*(Height-1)/(hGrid(2)-1)-GridThickness/2):1:round(GridThickness/2+(i-1)*(Height-1)/(hGrid(2)-1)),:,:)=0;
 
 end
-handles.effectIm(1:round(GridThickness/2),:,:)=1;
-handles.effectIm(Height:-1:Height-round(GridThickness/2),:,:)=1;
+handles.effectIm(1:round(GridThickness/2),:,:)=0;
+handles.effectIm(Height:-1:Height-round(GridThickness/2),:,:)=0;
 % handles.effectIm(:,:,-1::)=0;
 
 % handles.effectIm(1:100,1:100,:)=0;hGrid

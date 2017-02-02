@@ -11,6 +11,10 @@ if isfield(handles.movieStore,'MovieInfo')
                     CurrentSizeTrail(SpotIndex,:) = handles.movieStore.MovieInfo{MovieIndex}.PlainMovieInfo(SpotIndex).SpotInfo.SizeTrail;
                 end
             end
+        elseif isfield(handles.movieStore.MovieInfo{MovieIndex}.PlainMovieInfo,'BarInfo')
+            if ~isempty(handles.movieStore.MovieInfo{MovieIndex}.PlainMovieInfo(1).BarInfo)
+                CurrentSizeTrail = ones(1,handles.movieStore.MovieInfo{MovieIndex}.PlainMovieInfo(1).BarInfo.OnTime*handles.movieStore.MovieInfo{MovieIndex}.PlainMovieInfo(1).FreshRate);
+            end
         end
     end
 end

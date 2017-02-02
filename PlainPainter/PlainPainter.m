@@ -95,7 +95,7 @@ classdef PlainPainter < handle
                 this.Export = uicontrol('Parent',this.UIfigure,'Style','pushbutton',...
                  'String','Export','Position',[11*this.FontSize,FHeight - this.FontSize*36,6 * this.FontSize, 2*this.FontSize],'Callback',@this.Export_Callback);
                 this.Advanced = uicontrol('Parent',this.UIfigure,'Style','pushbutton',...
-                    'String','Advanced','Position',[20*this.FontSize,FHeight - this.FontSize*36,6 * this.FontSize, 2*this.FontSize],'Callback',@this.Advanced_Callback);
+                    'String','Advanced','Position',[20*this.FontSize,FHeight - this.FontSize*36,6 * this.FontSize, 2*this.FontSize],'Callback',@this.Advanced_Callback,'Visible', 'off');
                 %Advanced enable one to customized the spot trail as max
                 %freedom, a structure list including the information needed for
                 %generate a spot movie is demand,
