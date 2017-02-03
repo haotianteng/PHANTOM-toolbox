@@ -4,9 +4,12 @@ PHANTOM is a toolbox for generating Psychophyscis High Accuracy No-disTOrtion Mo
 PHANTOM's primary purpose is to generate psychophysics movies in 1 click, and project it with the correct position setting. It is designed for visual neural network research. Software also support triggering control and marker with supported Microscope system.
 ## Hardware and software Requirement
 ### Hardware
-Run smoothly on the following setting\
-Laptop: i7-5500U 2.4GHz,GTX 860M, 16GB RAM, Windows 10 pro,  512GB SSD.\
-Desktop: i7-4790K 4GHz,GTX 970,24GM RAM, Ubuntu 14.04, 512GB SSD.\
+Run smoothly on the following setting
+
+Laptop: i7-5500U 2.4GHz,GTX 860M, 16GB RAM, Windows 10 pro,  512GB SSD.
+
+Desktop: i7-4790K 4GHz,GTX 970,24GM RAM, Ubuntu 14.04, 512GB SSD.
+
 Trigger system is tested on a *Zen* Microscope platform with a *Nitional Instrument* IO Box (NI USB 6501).
 ### Software dependency
 PHANTOM require a MATLAB version newer than R2015b,Physicphysics ToolBox 3, GStreamer 1.10 or later version. (Optional) NI-DAQmx toolbox is required for triggering system. 
