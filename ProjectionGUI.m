@@ -1058,6 +1058,8 @@ function Play_Callback(hObject, eventdata, handles)
 % hObject    handle to Play (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+Trigger(handles.IO.Session,1,0);
+Trigger(handles.IO.Session,2,0);
 tstart = GetSecs;
 [m,n]=size(handles.movieList);
 %%%%%%%%%%%%%Trigger1
@@ -1065,7 +1067,7 @@ if ~isempty(handles.IO.Session)
     Trigger(handles.IO.Session,1,1);
 %     display('Trigger1 is on.');
 %     pause(0.5); %Used for the Test.
-    Trigger(handles.IO.Session,1,0)
+    Trigger(handles.IO.Session,1,0);
 %     display(['Trigger1 is off.',' Trigger last for',num2str(TriggerOffTime-TriggerOnTime),'Seconds']);
 end
 %%%%%%%%%%%%%%
