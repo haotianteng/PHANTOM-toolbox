@@ -18,7 +18,7 @@ For detail please see the installtion in  [Userguide](https://github.com/stardus
 
 
 ## For Users
-There are many sample movies in the **Movie** folder, including various kinds of spot and bar stimulation. Report any bug with a reproduce procedure to me by [Github Issues](https://github.com/stardust-t/ZebrafishGUI/issues).
+Detailed user guide can be found [Userguide](https://github.com/stardust-t/ZebrafishGUI/blob/master/UserGuide/User%20Guide%20for%20Zebreafish%20Projector%20GUI.pdf) or [Zacs Userguide](https://github.com/stardust-t/ZebrafishGUI/blob/master/UserGuide/ZACS%20User%20Guide%20for%20Zebreafish%20Projector%20GUI.pdf).There are many sample movies in the **Movie** folder, including various kinds of spot and bar stimulation. Report any bug with a reproduce procedure to me by [Github Issues](https://github.com/stardust-t/ZebrafishGUI/issues).
 
 ## For Developers
 Pull request welcome, also you can e-mail me by havens.teng@gmail.com for more information.
